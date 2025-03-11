@@ -5,7 +5,7 @@ db = SQLAlchemy()
 
 # Configurar o primeiro banco
 # engine = create_engine(
-#     'postgresql://postgres:PSWORD@localhost:PORT/NOME_DB'
+#     'postgresql://postgres:123456@localhost:5434/db_seupet'
 # )
 
 # db.engine = engine
