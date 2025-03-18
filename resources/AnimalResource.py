@@ -15,7 +15,7 @@ class AnimalResource(Resource):
         self.parser.add_argument('porte', required=True, type=str, help="Porte do animal é obrigatório.")
         self.parser.add_argument('pelagem', required=True, type=str, help="Pelagem do animal é obrigatória.")
         self.parser.add_argument('cadastro', required=True, type=str, help="Cadastro do animal é obrigatório.")
-        # self.parser.add_argument('foto', required=True, type=str, help="Foto do animal inválida.")
+        self.parser.add_argument('tutor_id', required=True, type=int, help="ID do tutor é obrigatório.", location='view_args')
 
     def get(self, tutor_id):
         tutor = Tutor.query.get(tutor_id)
@@ -32,10 +32,9 @@ class AnimalResource(Resource):
             if not tutor:
                 return {'Error': 'Tutor não encontrado'}, 404
             
-            dataNascimento = datetime.strptime(args['dataNascimento'], "%Y/%m/%d").date()
+            dataNascimento = datetime.strptime(args['dataNascimento'], "%Y-%m-%d").date()
             new_animal = Animal(
                 nome=args['nome'],
-                # dataNascimento=args['dataNascimento'],
                 dataNascimento=dataNascimento,
                 especie=args['especie'],
                 raca=args['raca'],
@@ -56,14 +55,70 @@ class AnimalResource(Resource):
             return {'Error': str(e)}, 500
 
 class AnimalByIdResource(Resource):
+    
     def __init__(self):
-        pass
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('nome', required=True, type=str, help="Nome do animal é obrigatório.")
+        self.parser.add_argument('dataNascimento', required=True, type=str, help="Data de nascimento do animal é obrigatória (formato: YYYY-MM-DD).")
+        self.parser.add_argument('especie', required=True, type=str, help="Espécie do animal é obrigatória.")
+        self.parser.add_argument('raca', required=True, type=str, help="Raça do animal é obrigatória.")
+        self.parser.add_argument('peso', required=True, type=float, help="Peso do animal é obrigatório.")
+        self.parser.add_argument('porte', required=True, type=str, help="Porte do animal é obrigatório.")
+        self.parser.add_argument('pelagem', required=True, type=str, help="Pelagem do animal é obrigatória.")
+        self.parser.add_argument('cadastro', required=True, type=str, help="Cadastro do animal é obrigatório.")
 
-    def get(self, tutor_id, pet_id):
-        pass
+    def get(self, animal_id):
+        try:
+            animal = Animal.query.get(animal_id)
+            if not animal:
+                return {'Error': 'Animal não encontrado'}, 404
+            
+            return marshal(animal, animal_fields), 200
+        except Exception as e:
+            return {'Error': str(e)}, 500
 
-    def put(self, pet_id):
-        pass
+    @marshal_with(animal_fields)
+    def put(self, tutor_id, pet_id): 
+        args = self.parser.parse_args()
+        try:
+            animal = Animal.query.get(pet_id)
+            if not animal:
+                return {'Error': 'Animal não encontrado'}, 404
 
-    def delete(self):
-        pass
+            
+            if animal.tutor_id != tutor_id:
+                return {'Error': 'Animal não pertence ao tutor especificado'}, 400
+
+            dataNascimento = datetime.strptime(args['dataNascimento'], "%Y-%m-%d").date()
+            animal.nome = args['nome']
+            animal.dataNascimento = dataNascimento
+            animal.especie = args['especie']
+            animal.raca = args['raca']
+            animal.peso = args['peso']
+            animal.porte = args['porte']
+            animal.pelagem = args['pelagem']
+            animal.cadastro = args['cadastro']
+
+            db.session.commit()
+
+            return animal, 200
+        except Exception as e:
+            db.session.rollback()
+            return {'Error': str(e)}, 500
+
+    def delete(self, tutor_id, pet_id):
+        try:
+            animal = Animal.query.get(pet_id)
+            if not animal:
+                return {'Error': 'Animal não encontrado'}, 404
+            
+            if animal.tutor_id != tutor_id:
+                return {'Error': 'Animal não pertence ao tutor especificado'}, 400
+            
+            db.session.delete(animal)
+            db.session.commit()
+
+            return {'Sucesso': 'Animal deletado com sucesso'}, 200
+        except Exception as e:
+            db.session.rollback()
+            return {'Error': str(e)}, 500
