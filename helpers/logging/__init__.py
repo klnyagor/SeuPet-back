@@ -1,5 +1,6 @@
 import logging
 from logging.handlers import RotatingFileHandler
+import os
 
 # Filtro personalizado para capturar somente um nível específico de log
 class LogLevelFilter(logging.Filter):
@@ -22,19 +23,19 @@ stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
 # Handler para mensagens INFO (rotaciona o arquivo)
-info_handler = RotatingFileHandler('info.log', maxBytes=10000, backupCount=3)
+info_handler = RotatingFileHandler('info.log', maxBytes=10000, backupCount=3, delay=True)
 info_handler.setFormatter(formatter)
 info_handler.addFilter(LogLevelFilter(logging.INFO))
 logger.addHandler(info_handler)
 
 # Handler para mensagens WARNING (rotaciona o arquivo)
-warning_handler = RotatingFileHandler('warning.log', maxBytes=10000, backupCount=3)
+warning_handler = RotatingFileHandler('warning.log', maxBytes=10000, backupCount=3, delay=True)
 warning_handler.setFormatter(formatter)
 warning_handler.addFilter(LogLevelFilter(logging.WARNING))
 logger.addHandler(warning_handler)
 
 # Handler para mensagens ERROR (rotaciona o arquivo)
-error_handler = RotatingFileHandler('error.log', maxBytes=10000, backupCount=3)
+error_handler = RotatingFileHandler('error.log', maxBytes=10000, backupCount=3, delay=True)
 error_handler.setFormatter(formatter)
 error_handler.addFilter(LogLevelFilter(logging.ERROR))
 logger.addHandler(error_handler)

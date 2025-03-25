@@ -174,3 +174,20 @@ class AnimalByIdResourceAllTutor(Resource):
         except Exception as err:
             logger.error("Erro ao listar animal")
             return {'Error': str(err)}, 500
+        
+    def delete(self, pet_id):
+        try:
+            animal = Animal.query.get(pet_id)
+            logger.info(f"DELETE /animais/{pet_id} Deletando animal: ID {pet_id}")
+            if not animal:
+                logger.warning(f"Animal {pet_id} não encontrado.")
+                return {'Error': 'Animal não encontrado'}, 404
+            
+            db.session.delete(animal)
+            db.session.commit()
+            logger.info("Animal deletado com sucesso.")
+            return {'Sucesso': 'Animal deletado com sucesso'}, 200
+        except Exception as e:
+            db.session.rollback()
+            logger.error("Erro ao deletar animal")
+            return {'Error': str(e)}, 500
