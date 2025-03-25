@@ -2,7 +2,7 @@ from flask_restful import fields
 from sqlalchemy import ForeignKey, Date
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from helpers.database import db
-from typing import List, Optional
+from typing import List
 from models.DateField import DateField
 
 from models.Tutor import tutor_fields
@@ -39,11 +39,8 @@ class Animal(db.Model):
     tutor_id: Mapped[int] = mapped_column(ForeignKey('tutor.id'))
     tutor: Mapped["Tutor"] = relationship(back_populates="animais")
 
-    # TODO: fix
-    # vermifugacoes: Mapped[List["Vermifugacao"]] = relationship(back_populates="animal")
-    # saudes: Mapped[List["Saude"]] = relationship(back_populates="animal")
-    # vacinas: Mapped[Optional[List["Vacina_Animal"]]] = relationship(back_populates="animal")
-    # doencas: Mapped[List["Doenca"]] = relationship(back_populates="animal")
+    #Relacionamento com Vacina_Animal
+    vacinas: Mapped[List["Vacina_Animal"]] = relationship(back_populates='animal', cascade='all, delete-orphan')
 
     def __init__(self, nome, dataNascimento, especie, raca, peso, porte, pelagem, cadastro, tutor_id): #, foto
         self.nome = nome

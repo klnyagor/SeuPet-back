@@ -1,11 +1,9 @@
 from flask_restful import fields
-from sqlalchemy import String, Integer, ForeignKey, Date
+from sqlalchemy import String, Integer, Date
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from helpers.database import db
-#from typing import List, Optional
+from typing import List
 from models.DateField import DateField
-
-#from models.Vacina_Animal import Vacina_Animal
 
 vacina_fields = {
     'id': fields.Integer,
@@ -21,11 +19,11 @@ class Vacina(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False)
     nome_vacina: Mapped[str] = mapped_column(String(100), nullable=False)
     fabricante: Mapped[str] = mapped_column(String(100), nullable=False)
-    data_validade: Mapped[str] = mapped_column(Date, nullable=False)
+    data_validade: Mapped[Date] = mapped_column(Date, nullable=False)
     lote: Mapped[str] = mapped_column(String(50), nullable=False)
 
     # Relacionamento com Vacina_Animal
-    #vacinas_animais: Mapped[List["Vacina_Animal"]] = relationship(back_populates='vacina', cascade="all, delete-orphan")
+    registros: Mapped[List["Vacina_Animal"]] = relationship(back_populates="vacina", cascade="all, delete-orphan")
 
     def __init__(self, nome_vacina, fabricante, data_validade, lote):
         self.nome_vacina = nome_vacina

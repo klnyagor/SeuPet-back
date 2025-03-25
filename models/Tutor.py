@@ -10,7 +10,6 @@ tutor_fields = {
     'nome': fields.String,
     'email': fields.String,
     'documento': fields.String,
-    # 'endereco_id': fields.Integer
     'endereco': fields.Nested(endereco_fields)
 }
 
